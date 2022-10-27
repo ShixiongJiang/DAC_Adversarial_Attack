@@ -62,14 +62,14 @@ def detect_cusum(x, threshold=1, drift=0, ending=False, show=True, ax=None):
     .. [2] https://github.com/demotu/detecta/blob/master/docs/detect_cusum.ipynb
     Examples
     --------
-    >>> x = np.random.randn(300)/5
-    >>> x[100:200] += np.arange(0, 4, 4/100)
-    >>> ta, tai, taf, amp = detect_cusum(x, 2, .02, True, True)
-    >>> x = np.random.randn(300)
-    >>> x[100:200] += 6
-    >>> detect_cusum(x, 4, 1.5, True, True)
-    >>> x = 2*np.sin(2*np.pi*np.arange(0, 3, .01))
-    >>> ta, tai, taf, amp = detect_cusum(x, 1, .05, True, True)
+    # >>> x = np.random.randn(300)/5
+    # >>> x[100:200] += np.arange(0, 4, 4/100)
+    # >>> ta, tai, taf, amp = detect_cusum(x, 2, .02, True, True)
+    # >>> x = np.random.randn(300)
+    # >>> x[100:200] += 6
+    # >>> detect_cusum(x, 4, 1.5, True, True)
+    # >>> x = 2*np.sin(2*np.pi*np.arange(0, 3, .01))
+    # >>> ta, tai, taf, amp = detect_cusum(x, 1, .05, True, True)
 
     Version history
     ---------------
@@ -171,3 +171,14 @@ def _plot(x, threshold, drift, ending, ax, ta, tai, taf, gp, gn):
         ax2.legend(loc='best', framealpha=.5, numpoints=1)
         plt.tight_layout()
         plt.show()
+
+
+if __name__ == '__main__':
+    x = np.random.randn(300)/5
+    x[100:200] += np.arange(0, 4, 4/100)
+    ta, tai, taf, amp = detect_cusum(x, 1.5, .02, True, True)
+    # x = np.random.randn(300)
+    # x[100:200] += 6
+    # detect_cusum(x, 4, 1.5, True, True)
+    # x = 2*np.sin(2*np.pi*np.arange(0, 3, .01))
+    # ta, tai, taf, amp = detect_cusum(x, 1, .05, True, True)
