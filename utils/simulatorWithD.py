@@ -135,7 +135,7 @@ class Simulator:
         Only implement the white noise
         keys:
           'process'/'measurement':
-            'type': 'white'  todo: 'white_bounded', 'box_uniform', 'ball_uniform'
+            'type': 'white'  todo: 'white_bounded', 'box_ uniform', 'ball_uniform'
             'param':
               'C': linear transformation matrix from standard normal distribution      scale for 'white'
         """

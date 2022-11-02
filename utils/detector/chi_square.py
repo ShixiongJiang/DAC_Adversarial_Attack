@@ -2,10 +2,17 @@
 import numpy as np
 from numpy.linalg import inv
 
+"""
+for any column vectors, the covariance matrix
+    Cov(x) = E[ZZT] - (E[Z])(E[Z])T
+"""
 
 class chi_square():
     def __init__(self, threshold=500):
         self.threshold = threshold
+
+    def columnCon(self, z):
+        cov =
 
     def detect(self, z_t):
         z_t = np.reshape(z_t, (z_t.size, 1))
