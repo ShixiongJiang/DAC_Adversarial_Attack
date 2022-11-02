@@ -77,8 +77,8 @@ __license__ = "MIT"
 
 
 class CUSUM:
-    def __init__(self, X, threshold=1.0, drift=0, ending=False, show=False, ax=None):
-        self.X = X
+    def __init__(self, threshold=1.0, drift=0, ending=False, show=False, ax=None):
+        self.X = None
         self.threshold = threshold
         self.drift = drift
         self.ending = ending
@@ -87,67 +87,46 @@ class CUSUM:
         self.ta = None
         self.tai = None
         self.taf = None
+        self.gp = 0
+        self.gn = 0
 
-    def detect_cusum(self):
-        
-        
-        for x in self.X:
-            x = np.atleast_1d(x).astype('float64')
-            gp, gn = np.zeros(x.size), np.zeros(x.size)
-            ta, tai, taf = np.array([[], [], []], dtype=int)
-            tap, tan = 0, 0
-            amp = np.array([])
-            # Find changes (online form)
-            for i in range(1, x.size):
-                s = x[i] - x[i - 1]
-                gp[i] = gp[i - 1] + s - self.drift  # cumulative sum for + change
-                gn[i] = gn[i - 1] - s - self.drift  # cumulative sum for - change
-                if gp[i] < 0:
-                    gp[i], tap = 0, i
-                if gn[i] < 0:
-                    gn[i], tan = 0, i
-                if gp[i] > self.threshold or gn[i] > self.threshold:  # change detected!
-                    ta = np.append(ta, i)  # alarm index
-                    tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start
-                    gp[i], gn[i] = 0, 0  # reset alarm
-
-            # THE CLASSICAL CUSUM ALGORITHM ENDS HERE
-            if self.show:
-                _plot(x, self.threshold, self.drift, self.ending, self.ax, ta, tai, taf, gp, gn)
-            # if self.ta is None:
-            #     self.ta = ta
-            # else:
-            #     self.ta = np.vstack([self.ta, ta])
-            # self.tai = np.vstack([self.tai, tai])
-            # self.taf = np.vstack([self.taf, taf])
-            # # Estimation of when the change ends (offline form)
-            # if tai.size and self.ending:
-            #     _, tai2, _, _ = self.detect_cusum(x[::-1], threshold, drift, show=False)
-            #     taf = x.size - tai2[::-1] - 1
-            #     # Eliminate repeated changes, changes that have the same beginning
-            #     tai, ind = np.unique(tai, return_index=True)
-            #     ta = ta[ind]
-            #     # taf = np.unique(taf, return_index=False)  # corect later
-            #     if tai.size != taf.size:
-            #         if tai.size < taf.size:
-            #             taf = taf[[np.argmax(taf >= i) for i in ta]]
-            #         else:
-            #             ind = [np.argmax(i >= ta[::-1]) - 1 for i in taf]
-            #             ta = ta[ind]
-            #             tai = tai[ind]
-            #     # Delete intercalated changes (the ending of the change is after
-            #     # the beginning of the next change)
-            #     ind = taf[:-1] - tai[1:] > 0
-            #     if ind.any():
-            #         ta = ta[~np.append(False, ind)]
-            #         tai = tai[~np.append(False, ind)]
-            #         taf = taf[~np.append(ind, False)]
-            #     # Amplitude of changes
-            #     amp = x[taf] - x[tai]
-
-            
-
-        # return ta, tai, taf, amp
+    def detect_cusum(self, s):  # s is residual
+        self.gp = self.gp + s - self.drift
+        self.gn = self.gn - s - self.drift
+        if self.gp < 0:
+            self.gp, tap = 0, i
+        if self.gn < 0:
+            self.gn, tan = 0, i
+        if self.gp > self.threshold or self.gn > self.threshold:  # change detected!
+            # ta = np.append(ta, i)  # alarm index
+            # tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start
+            self.gp, self.gn = 0, 0  # reset alarm
+        # self.X = X
+        #
+        # for x in self.X:
+        #     x = np.atleast_1d(x).astype('float64')
+        #     gp, gn = np.zeros(x.size), np.zeros(x.size)
+        #     ta, tai, taf = np.array([[], [], []], dtype=int)
+        #     tap, tan = 0, 0
+        #     amp = np.array([])
+        #     # Find changes (online form)
+        #     for i in range(1, x.size):
+        #         s = x[i] - x[i - 1]
+        #         gp[i] = gp[i - 1] + s - self.drift  # cumulative sum for + change
+        #         gn[i] = gn[i - 1] - s - self.drift  # cumulative sum for - change
+        #         if gp[i] < 0:
+        #             gp[i], tap = 0, i
+        #         if gn[i] < 0:
+        #             gn[i], tan = 0, i
+        #         if gp[i] > self.threshold or gn[i] > self.threshold:  # change detected!
+        #             ta = np.append(ta, i)  # alarm index
+        #             tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start
+        #             gp[i], gn[i] = 0, 0  # reset alarm
+        #
+        #     # THE CLASSICAL CUSUM ALGORITHM ENDS HERE
+        #     if self.show:
+        #         _plot(x, self.threshold, self.drift, self.ending, self.ax, ta, tai, taf, gp, gn)
+        #
 
 
 def _plot(x, threshold, drift, ending, ax, ta, tai, taf, gp, gn):

@@ -29,7 +29,7 @@ else:
 logger.info(f'simulator: numpy random seed is set to {rseed}.')
 np.random.seed(rseed)
 
-class Simulator:
+class SimulatorWithD:
     """
     states, control inputs/outputs are instance of np.array with shape (n,) (m,) (p,)
     """
@@ -66,7 +66,7 @@ class Simulator:
         self.kalman_filter = None
         self.kf_P = None
         self.residual = None
-        self.detector = 'test_detector'
+        self.detector = None
         self.alert = None
 
     def data_init(self):
@@ -129,6 +129,7 @@ class Simulator:
             self.noise_init(settings['noise'])
         self.set_init_state(settings['init_state'])
         self.set_controller(settings['controller'])
+        self.set_detector(settings['detector'])
 
     def noise_init(self, noise):
         """
@@ -176,6 +177,10 @@ class Simulator:
         please implement update method to get control input
         """
         self.controller = controller
+
+    def set_detector(self, detector):
+
+        self.detector = detector
 
     def update_current_ref(self, ref):
         self.cur_ref = ref
@@ -233,7 +238,6 @@ class Simulator:
 
         # detect
         if self.detector:
-            if self.detector == 'test_detector':
-                self.alert = test_detector(self.residual)
+            self.alart = self.detector.detect_cusum(self.residual)
 
         return self.cur_index, self.alert

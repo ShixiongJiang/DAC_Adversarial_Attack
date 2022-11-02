@@ -1,8 +1,9 @@
 import numpy as np
 
-from utils import PID, Simulator
-
+from utils import PID, SimulatorWithD
 # system dynamics
+from utils.detector import CUSUM
+
 R = 10000
 L = 0.5
 C = 0.0001
@@ -43,15 +44,17 @@ class Controller:
         self.pid.clear(current_time=-self.dt)
 
 
-class RlcCircuit(Simulator):
+class RlcCircuit(SimulatorWithD):
     def __init__(self, name, dt, max_index, noise=None):
         super().__init__('Aircraft Pitch ' + name, dt, max_index)
         self.linear(A, B, C)
         controller = Controller(dt)
+        detector = CUSUM(threshold=1.0, drift=0.05)
         settings = {
             'init_state': x_0,
             'feedback_type': 'output',
-            'controller': controller
+            'controller': controller,
+            'detector':detector
         }
         if noise:
             settings['noise'] = noise
@@ -61,7 +64,7 @@ class RlcCircuit(Simulator):
 if __name__ == "__main__":
     max_index = 500
     dt = 0.02
-    ref = [np.array([2])] * 201 + [np.array([3])] * 200 + [np.array([2])] * 100
+    ref = [np.array([2])] * 201 + [np.array([2])] * 200 + [np.array([2])] * 100
     noise = {
         'process': {
             'type': 'white',
