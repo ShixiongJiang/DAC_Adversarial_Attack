@@ -2,7 +2,8 @@
 
 import numpy as np
 
-from utils import PID, Simulator
+from utils import PID, SimulatorWithD
+from utils.detector import CUSUM
 
 # system dynamics
 J = 0.01   # moment of inertia of the rotor
@@ -51,7 +52,7 @@ class Controller:
         self.pid.clear(current_time=-self.dt)
 
 
-class MotorSpeed(Simulator):
+class MotorSpeed(SimulatorWithD):
     """
             States: (2,)
                 x[0]: the rotational speed of the shaft
@@ -67,10 +68,12 @@ class MotorSpeed(Simulator):
         super().__init__('Motor Speed ' + name, dt, max_index)
         self.linear(A, B, C)
         controller = Controller(dt)
+        detector = CUSUM(threshold=1.0, drift=0.05)
         settings = {
             'init_state': x_0,
             'feedback_type': 'output',
-            'controller': controller
+            'controller': controller,
+            'detector': detector
         }
         if noise:
             settings['noise'] = noise

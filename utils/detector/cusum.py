@@ -94,9 +94,9 @@ class CUSUM:
         self.gp = self.gp + s - self.drift
         self.gn = self.gn - s - self.drift
         if self.gp < 0:
-            self.gp, tap = 0, i
+            self.gp = 0
         if self.gn < 0:
-            self.gn, tan = 0, i
+            self.gn = 0
         if self.gp > self.threshold or self.gn > self.threshold:  # change detected!
             # ta = np.append(ta, i)  # alarm index
             # tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start

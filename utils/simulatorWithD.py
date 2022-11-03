@@ -4,7 +4,7 @@ from copy import deepcopy
 from scipy.signal import StateSpace
 from scipy.integrate import solve_ivp
 from utils.formal.gaussian_distribution import GaussianDistribution
-from utils.observers import kalman_filter
+from utils.observers.kalman_filter import KalmanFilter
 from utils.detector.test import test_detector
 
 logging.basicConfig(
@@ -100,7 +100,7 @@ class SimulatorWithD:
         self.p = self.sysc.C.shape[0]
         self.C = self.sysc.C
         self.D = self.sysc.D
-        self.kalman_filter = kalman_filter(A, B, C, D, self.p_noise_C, self.m_noise_C)
+        self.kalman_filter = KalmanFilter(self.sysd.A, self.sysd.B, self.sysd.C, D, self.p_noise_C, self.m_noise_C)
 
         def fprime(t, x, u):
             return self.sysc.A @ x + self.sysc.B @ u
@@ -227,17 +227,18 @@ class SimulatorWithD:
         #     self.cur_feedback = None
 
         # prepare feedback with kalman filter
-        if self.kalman_filter:
-            if self.feedback_type =='state':
-                self.cur_feedback, self.kf_P, self.residual = self.kalman_filter.one_step(self.last_x, self.kf_P, self.cur_u, self.cur_y)
-        else:
-            if self.feedback_type == 'output':
-                self.cur_feedback = self.cur_y
-            else:
-                self.cur_feedback = None
-
-        # detect
-        if self.detector:
-            self.alart = self.detector.detect_cusum(self.residual)
+        # if self.kalman_filter:
+        #     if self.feedback_type =='state':
+        #         self.cur_feedback, self.kf_P, self.residual = self.kalman_filter.one_step(self.last_x, self.kf_P, self.cur_u, self.cur_y)
+        # else:
+        #     if self.feedback_type == 'output':
+        #         self.cur_feedback = self.cur_y
+        #     else:
+        #         self.cur_feedback = None
+        #
+        # # detect
+        # if self.detector:
+        #
+        #     self.alart = self.detector.detect_cusum(self.residual)
 
         return self.cur_index, self.alert
