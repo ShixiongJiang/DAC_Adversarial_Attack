@@ -240,5 +240,10 @@ class SimulatorWithD:
         # if self.detector:
         #
         #     self.alart = self.detector.detect_cusum(self.residual)
-
+        # prepare feedback
+        if self.feedback_type:
+            self.cur_feedback = self.cur_x if self.feedback_type == 'state' else self.cur_y
+            # self.cur_feedback may be attacked before implement
+        else:
+            self.cur_feedback = None
         return self.cur_index, self.alert
