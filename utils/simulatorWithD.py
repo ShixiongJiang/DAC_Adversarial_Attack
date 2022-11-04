@@ -185,7 +185,7 @@ class SimulatorWithD:
     def update_current_ref(self, ref):
         self.cur_ref = ref
 
-    def evolve(self, u=None):
+    def evolve(self, u=None, x_update=None):
         # record data
         self.feedbacks[self.cur_index] = deepcopy(self.cur_feedback)
         self.refs[self.cur_index] = deepcopy(self.cur_ref)
@@ -242,7 +242,10 @@ class SimulatorWithD:
         #     self.alart = self.detector.detect_cusum(self.residual)
         # prepare feedback
         if self.feedback_type:
-            self.cur_feedback = self.cur_x if self.feedback_type == 'state' else self.cur_y
+            if x_update is None:
+                self.cur_feedback = self.cur_x if self.feedback_type == 'state' else self.cur_y
+            else:
+                self.cur_feedback = x_update if self.feedback_type == 'state' else self.cur_y
             # self.cur_feedback may be attacked before implement
         else:
             self.cur_feedback = None

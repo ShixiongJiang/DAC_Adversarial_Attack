@@ -52,7 +52,7 @@ class RlcCircuit(SimulatorWithD):
         detector = CUSUM(threshold=1.0, drift=0.05)
         settings = {
             'init_state': x_0,
-            'feedback_type': 'output',
+            'feedback_type': 'state',
             'controller': controller,
             'detector':detector
         }

@@ -101,6 +101,9 @@ class CUSUM:
             # ta = np.append(ta, i)  # alarm index
             # tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start
             self.gp, self.gn = 0, 0  # reset alarm
+            return True
+        else:
+            return False
         # self.X = X
         #
         # for x in self.X:

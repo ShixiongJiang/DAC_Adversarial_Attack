@@ -54,13 +54,19 @@ for exp in exps:
     kf_Q = exp.model.p_noise_dist.sigma if exp.model.p_noise_dist is not None else np.zeros_like(A)
     kf_R = exp.kf_R
     kf_P = np.zeros_like(A)
-    kf = KalmanFilter(A, B, kf_C, D, kf_Q, kf_R)
+    kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
     detector = CUSUM()
+    x_update = None
     for i in range(0, exp.max_index + 1):
         assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
-        if i > 1:
-            x_update, P_update, residual = kf.one_step(exp.model.last_x, kf_P, exp.model.cur_u, exp.model.cur_y)
-            logger.debug(f"state={exp.model.cur_x=}, predict={x_update}, residual={residual}")
-        exp.model.evolve()
+        exp.model.evolve(x_update=x_update)
+        if i == 0:
+            x_update = exp.model.cur_x
+        if i > 0:
+            x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
+            kf_P = P_update
+            alarm = detector.detect_cusum(s=residual)
+            logger.debug(f"state={exp.model.cur_x}, predict={x_update}, residual={residual}, alarm={alarm}")
+
 
