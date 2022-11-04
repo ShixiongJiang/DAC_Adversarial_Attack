@@ -60,7 +60,12 @@ for exp in exps:
         assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
         if i > 1:
+            if i > 2:
+                kf_P = P_update
             x_update, P_update, residual = kf.one_step(exp.model.last_x, kf_P, exp.model.cur_u, exp.model.cur_y)
-            logger.debug(f"state={exp.model.cur_x}, predict={x_update}, residual={residual}")
+            exp.model.cur_feedback = x_update
+            # exp.model.cur_x here represents y, since it is easier to compare with kalman result than use direct y.
+            logger.debug(f"state_estimate={x_update}, state_process={exp.model.cur_x}, last_input={exp.model.cur_u}, residual={residual}")
+
         exp.model.evolve()
 
