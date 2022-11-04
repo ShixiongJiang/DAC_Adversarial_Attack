@@ -19,7 +19,7 @@ from utils.controllers.LP_cvxpy import LP
 from utils.controllers.MPC_cvxpy import MPC
 from utils.detector.cusum import CUSUM
 # exps = [motor_speed_bias]
-exps = [rlc_circuit_bias]
+exps = [motor_speed_bias]
 colors = {'none': 'red', 'lp': 'cyan', 'lqr': 'blue', 'ssr': 'orange', 'oprp': 'violet', 'oprp-open': 'purple'}
 result = {}  # for print or plot
 

@@ -25,7 +25,7 @@ class KalmanFilter:
         x_predict, P_predict = self.predict(x, P, u)
         x_update, P_update = self.update(x_predict, P_predict, y)
         residual = y-self.C @ x_predict
-        return x_predict, P_update, residual
+        return x_update, P_update, residual
 
     def multi_steps(self, x: np.ndarray, P: np.ndarray, us: np.ndarray, ys: np.ndarray):
         """
