@@ -60,11 +60,12 @@ for exp in exps:
     for i in range(0, exp.max_index + 1):
         assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
-        exp.model.evolve(x_update=x_update)
+        exp.model.evolve()
         if i == 0:
             x_update = exp.model.cur_x
         if i > 0:
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
+            exp.model.cur_feedback = x_update
             kf_P = P_update
             alarm = detector.detect_cusum(s=residual)
             logger.debug(f"state={exp.model.cur_x}, predict={x_update}, residual={residual}, alarm={alarm}")
