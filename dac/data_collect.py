@@ -18,6 +18,7 @@ from utils.observers.full_state_bound import Estimator
 from utils.controllers.LP_cvxpy import LP
 from utils.controllers.MPC_cvxpy import MPC
 from utils.detector.cusum import CUSUM
+from utils.detector.chi_square import chi_square
 # exps = [motor_speed_bias]
 exps = [motor_speed_bias]
 colors = {'none': 'red', 'lp': 'cyan', 'lqr': 'blue', 'ssr': 'orange', 'oprp': 'violet', 'oprp-open': 'purple'}
@@ -55,7 +56,8 @@ for exp in exps:
     kf_R = exp.kf_R
     kf_P = np.zeros_like(A)
     kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
-    detector = CUSUM()
+    # detector = CUSUM()
+    detector = chi_square()
     x_update = None
     for i in range(0, exp.max_index + 1):
         assert exp.model.cur_index == i
@@ -67,7 +69,7 @@ for exp in exps:
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
             exp.model.cur_feedback = x_update
             kf_P = P_update
-            alarm = detector.detect_cusum(s=residual)
+            alarm = detector.detect(residual)
             logger.debug(f"state={exp.model.cur_x}, predict={x_update}, residual={residual}, alarm={alarm}")
 
 

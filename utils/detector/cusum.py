@@ -90,7 +90,7 @@ class CUSUM:
         self.gp = 0
         self.gn = 0
 
-    def detect_cusum(self, s):  # s is residual
+    def detect(self, s):  # s is residual
         self.gp = self.gp + s - self.drift
         self.gn = self.gn - s - self.drift
         if self.gp < 0:

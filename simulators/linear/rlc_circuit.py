@@ -53,8 +53,7 @@ class RlcCircuit(SimulatorWithD):
         settings = {
             'init_state': x_0,
             'feedback_type': 'state',
-            'controller': controller,
-            'detector':detector
+            'controller': controller
         }
         if noise:
             settings['noise'] = noise

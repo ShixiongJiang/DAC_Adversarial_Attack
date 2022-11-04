@@ -66,7 +66,6 @@ class SimulatorWithD:
         self.kalman_filter = None
         self.kf_P = None
         self.residual = None
-        self.detector = None
         self.alert = None
 
     def data_init(self):
@@ -129,7 +128,7 @@ class SimulatorWithD:
             self.noise_init(settings['noise'])
         self.set_init_state(settings['init_state'])
         self.set_controller(settings['controller'])
-        self.set_detector(settings['detector'])
+
 
     def noise_init(self, noise):
         """
@@ -178,9 +177,6 @@ class SimulatorWithD:
         """
         self.controller = controller
 
-    def set_detector(self, detector):
-
-        self.detector = detector
 
     def update_current_ref(self, ref):
         self.cur_ref = ref
