@@ -28,7 +28,7 @@ class motor_speed_bias:
         },
         'measurement': {
             'type': 'white',
-            'param': {'C': np.array([[0.1, 0.1]])}
+            'param': {'C': np.array([[0.01, 0.01]])}
         }
     }
     model = MotorSpeed('bias', dt, max_index, noise)

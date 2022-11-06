@@ -19,8 +19,8 @@ from utils.controllers.LP_cvxpy import LP
 from utils.controllers.MPC_cvxpy import MPC
 from utils.detector.cusum import CUSUM
 from utils.detector.chi_square import chi_square
-# exps = [motor_speed_bias]
 exps = [motor_speed_bias]
+# exps = [rlc_circuit_bias]
 colors = {'none': 'red', 'lp': 'cyan', 'lqr': 'blue', 'ssr': 'orange', 'oprp': 'violet', 'oprp-open': 'purple'}
 result = {}  # for print or plot
 
@@ -57,7 +57,7 @@ for exp in exps:
     kf_P = np.zeros_like(A)
     kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
     # detector = CUSUM()
-    detector = chi_square()
+    detector = chi_square(threshold=5)
     x_update = None
     for i in range(0, exp.max_index + 1):
         assert exp.model.cur_index == i
@@ -71,5 +71,4 @@ for exp in exps:
             kf_P = P_update
             alarm = detector.detect(residual)
             logger.debug(f"state={exp.model.cur_x}, predict={x_update}, residual={residual}, alarm={alarm}")
-
 

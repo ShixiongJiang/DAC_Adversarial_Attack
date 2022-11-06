@@ -8,27 +8,34 @@ for any column vectors, the covariance matrix
 """
 
 class chi_square():
-    def __init__(self, threshold=0.1):
+    def __init__(self, threshold=0.5):
         self.threshold = threshold
         self.Z_k = None
     # def columnCon(self, z):
     #     cov =
 
     def detect(self, z_k):
+        z_k = z_k[:, np.newaxis]
         if self.Z_k is None:
             self.Z_k = z_k
+            # self.Z_k = self.Z_k[:, np.newaxis]
         else:
-            self.Z_k = np.vstack((self.Z_k, z_k))
-      
+            self.Z_k = np.append(self.Z_k, z_k,  axis=1)
+        if self.Z_k.size == 1:
+            return False
+
+
         # z_k = np.reshape(z_k, (z_k.size, 1))
         # print(z_t.shape)
-        P_k = np.cov(self.Z_k, rowvar=False)
-        P_k = np.array([(P_k)])
+        P_k = np.cov(self.Z_k, rowvar=True, bias=True)
+        P_k = np.reshape(P_k, (-1, 1))
         # print(p_k)
-
+        inv_ma = inv(P_k)
         # print(z_t.T.shape)
-        g_k = self.Z_k.T * inv(P_k.reshape(1,1)) @ self.Z_k
-        print(g_k)
+        g_k = z_k.T @ inv_ma @ z_k
+
+
+
         if g_k > self.threshold:
             return True
         else:

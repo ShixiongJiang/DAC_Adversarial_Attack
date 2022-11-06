@@ -68,7 +68,6 @@ class MotorSpeed(SimulatorWithD):
         super().__init__('Motor Speed ' + name, dt, max_index)
         self.linear(A, B, C)
         controller = Controller(dt)
-        detector = CUSUM(threshold=1.0, drift=0.05)
         settings = {
             'init_state': x_0,
             'feedback_type': 'state',
