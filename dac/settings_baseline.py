@@ -18,9 +18,9 @@ from utils.formal.strip import Strip
 class motor_speed_bias:
     # needed by 0_attack_no_recovery
     name = 'motor_speed_bias'
-    max_index = 500
+    max_index = 1000
     dt = 0.02
-    ref = [np.array([4])] * 501
+    ref = [np.array([5])] * 1001
     noise = {
         'process': {
             'type': 'white',
@@ -36,7 +36,7 @@ class motor_speed_bias:
     control_up = np.array([60])
     model.controller.set_control_limit(control_lo, control_up)
     attack_start_index = 150
-    bias = np.array([-1])
+    bias = np.array([1])
     attack = Attack('bias', bias, attack_start_index)
     recovery_index = 180
 

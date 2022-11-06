@@ -29,10 +29,11 @@ class chi_square():
         # print(z_t.shape)
         P_k = np.cov(self.Z_k, rowvar=True, bias=True)
         P_k = np.reshape(P_k, (-1, 1))
-        # print(p_k)
         inv_ma = inv(P_k)
         # print(z_t.T.shape)
         g_k = z_k.T @ inv_ma @ z_k
+        # print(g_k)
+
 
 
 
