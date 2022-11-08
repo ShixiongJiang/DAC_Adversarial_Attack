@@ -11,6 +11,7 @@ from simulators.linear.quadrotor import Quadrotor
 from simulators.linear.lane_keeping import LaneKeeping
 
 from utils.attack import Attack
+from utils.query import Query
 from utils.formal.strip import Strip
 
 
@@ -38,6 +39,10 @@ class motor_speed_bias:
     attack_start_index = 150
     bias = np.array([1])
     attack = Attack('bias', bias, attack_start_index)
+    y_low = np.array([0])
+    y_up = np.array([10])
+    query_start_index = 200
+    query = Query(y_up, y_low, K=16,start_index=query_start_index)
     recovery_index = 180
 
     # needed by 1_recovery_given_p
@@ -136,6 +141,7 @@ class f16_bias:
     attack_start_index = 400
     bias = np.array([-1])
     attack = Attack('bias', bias, attack_start_index)
+
     recovery_index = 420
 
     # needed by 1_recovery_given_p

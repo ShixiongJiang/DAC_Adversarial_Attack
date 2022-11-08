@@ -66,26 +66,32 @@ for exp in exps:
     control_list = []
     alarm_list = []
     residual_list = []
-    for i in range(0, exp.max_index + 1):
-        assert exp.model.cur_index == i
-        exp.model.update_current_ref(exp.ref[i])
 
+    for i in range(0, exp.max_index + 1):
+        # assert exp.model.cur_index == i
+        exp.model.update_current_ref(exp.ref[i])
         exp.model.evolve()
         if i == 0:
             x_update = exp.model.cur_x
         if i > 0:
             # exp.model.cur_y = exp.attack.launch(exp.model.cur_y, i, exp.model.states)
+            exp.model.cur_y = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
             exp.model.cur_feedback = x_update
             kf_P = P_update
             alarm = detector.detect(residual)
-            logger.debug(f"i = {i}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
-            reference_list.append(exp.ref[i])
-            x_update_list.append(x_update)
-            y_list.append(exp.model.cur_y)
-            control_list.append(exp.model.cur_u)
-            alarm_list.append(alarm)
-            residual_list.append(residual)
+            logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
+            if exp.model.cur_index >= exp.query.start_index:
+                reference_list.append(exp.ref[i])
+                x_update_list.append(x_update)
+                y_list.append(exp.model.cur_y)
+                control_list.append(exp.model.cur_u)
+                alarm_list.append(alarm)
+                residual_list.append(residual)
+
+            if alarm and exp.model.cur_index >= exp.query_start_index:
+                exp.model.reset()
+
 
     df = pd.DataFrame({"reference": reference_list, "x_update": x_update_list, 'y':y_list, 'control':control_list
                        , 'alarm_list': alarm_list, 'residual':residual_list})
