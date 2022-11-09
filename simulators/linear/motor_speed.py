@@ -15,7 +15,7 @@ L = 0.5    # electric inductance
 
 A = [[-b / J, Kt / J], [-Ke / L, -R / L]]
 B = [[0], [1 / L]]
-C = [[1, 0]]
+C = [[1, 1]]
 
 x_0 = np.array([0.0, 0.0])
 

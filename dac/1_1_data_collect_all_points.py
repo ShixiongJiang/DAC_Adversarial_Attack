@@ -7,6 +7,7 @@ import os
 from time import perf_counter
 import csv
 import pandas as pd
+from utils.query import Query
 
 os.environ["RANDOM_SEED"] = '0'   # for reproducibility
 
@@ -68,9 +69,10 @@ for exp in exps:
     residual_list = []
     end_query = False
     i = 0
-    exp.query.K = 64
-    exp.query.query_point_reset()
-    exp.query.generate_square_points(0)
+    y_low = np.array([0])
+    y_up = np.array([10])
+    query_start_index = 200
+    exp.query = Query(y_up, y_low, K=64, start_index=query_start_index)
     while not end_query:
         # assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
@@ -93,7 +95,7 @@ for exp in exps:
                 alarm_list.append(alarm)
                 residual_list.append(residual)
 
-            if alarm and exp.model.cur_index >= exp.query_start_index:
+            if exp.model.cur_index >= exp.query_start_index:
                 exp.model.reset()
                 i = 0
         i += 1
