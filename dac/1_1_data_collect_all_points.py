@@ -40,7 +40,7 @@ logger.setLevel(logging.DEBUG)
 
 
 for exp in exps:
-    data_file = 'res/data_collect_'+exp.name+'.csv'
+    data_file = 'res/1_1data_collect_all_points'+exp.name+'.csv'
     # headers = ['']
     # times = 50
     # with open(data_file, 'w', newline='') as f:
@@ -66,8 +66,12 @@ for exp in exps:
     control_list = []
     alarm_list = []
     residual_list = []
-
-    for i in range(0, exp.max_index + 1):
+    end_query = False
+    i = 0
+    exp.query.K = 64
+    exp.query.query_point_reset()
+    exp.query.generate_square_points(0)
+    while not end_query:
         # assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
         exp.model.evolve()
@@ -75,7 +79,7 @@ for exp in exps:
             x_update = exp.model.cur_x
         if i > 0:
             # exp.model.cur_y = exp.attack.launch(exp.model.cur_y, i, exp.model.states)
-            exp.model.cur_y = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
+            exp.model.cur_y, end_query = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
             exp.model.cur_feedback = x_update
             kf_P = P_update
@@ -91,7 +95,8 @@ for exp in exps:
 
             if alarm and exp.model.cur_index >= exp.query_start_index:
                 exp.model.reset()
-
+                i = 0
+        i += 1
 
     df = pd.DataFrame({"reference": reference_list, "x_update": x_update_list, 'y':y_list, 'control':control_list
                        , 'alarm_list': alarm_list, 'residual':residual_list})
