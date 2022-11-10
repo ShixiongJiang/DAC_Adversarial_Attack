@@ -54,7 +54,7 @@ for exp in exps:
     kf_Q = exp.model.p_noise_dist.sigma if exp.model.p_noise_dist is not None else np.zeros_like(A)
     kf_R = exp.kf_R
     kf_P = np.zeros_like(A)
-    kf = KalmanFilter(A, B, kf_C, D, kf_Q, kf_R)
+    kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
     detector = CUSUM()
     for i in range(0, exp.max_index + 1):
         assert exp.model.cur_index == i
