@@ -77,7 +77,7 @@ class SimulatorWithD:
             self.refs = np.empty((self.max_index + 2, self.p), dtype=np.float)
         elif self.feedback_type == 'state':
             self.feedbacks = np.empty((self.max_index + 2, self.n), dtype=np.float)
-            self.refs = np.empty((self.max_index + 2, self.n), dtype=np.float)  # reference value
+            self.refs = np.empty((self.max_index + 2, self.p), dtype=np.float)  # reference value
 
     def reset(self):
         # the noise will not reset!

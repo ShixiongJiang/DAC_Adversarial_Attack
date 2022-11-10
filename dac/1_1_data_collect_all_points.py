@@ -8,7 +8,7 @@ from time import perf_counter
 import csv
 import pandas as pd
 from utils.query import Query
-
+import matplotlib.pyplot as plt
 os.environ["RANDOM_SEED"] = '0'   # for reproducibility
 
 from settings_baseline import motor_speed_bias, quadruple_tank_bias, lane_keeping, f16_bias, aircraft_pitch_bias, boeing747_bias, platoon_bias, quadrotor_bias, rlc_circuit_bias
@@ -21,8 +21,9 @@ from utils.controllers.LP_cvxpy import LP
 from utils.controllers.MPC_cvxpy import MPC
 from utils.detector.cusum import CUSUM
 from utils.detector.chi_square import chi_square
-exps = [motor_speed_bias]
+# exps = [motor_speed_bias]
 # exps = [rlc_circuit_bias]
+exps = [quadruple_tank_bias]
 colors = {'none': 'red', 'lp': 'cyan', 'lqr': 'blue', 'ssr': 'orange', 'oprp': 'violet', 'oprp-open': 'purple'}
 result = {}  # for print or plot
 
@@ -69,10 +70,10 @@ for exp in exps:
     residual_list = []
     end_query = False
     i = 0
-    y_low = np.array([0])
-    y_up = np.array([10])
-    query_start_index = 200
-    exp.query = Query(y_up, y_low, K=64, start_index=query_start_index)
+    # y_low = np.array([0])
+    # y_up = np.array([10])
+    # query_start_index = 200
+    # exp.query = Query(y_up, y_low, K=64, start_index=query_start_index)
     while not end_query:
         # assert exp.model.cur_index == i
         exp.model.update_current_ref(exp.ref[i])
@@ -86,7 +87,7 @@ for exp in exps:
             exp.model.cur_feedback = x_update
             kf_P = P_update
             alarm = detector.detect(residual)
-            logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
+            # logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
             if exp.model.cur_index >= exp.query.start_index:
                 reference_list.append(exp.ref[i])
                 x_update_list.append(x_update)
@@ -103,10 +104,14 @@ for exp in exps:
     df = pd.DataFrame({"reference": reference_list, "x_update": x_update_list, 'y':y_list, 'control':control_list
                        , 'alarm_list': alarm_list, 'residual':residual_list})
     df.to_csv(data_file, index=True)
-    index = 0
-    for x in alarm_list:
-        if x:
-            index += 1
+    for i in range(len(reference_list)):
+        if not alarm_list[i]:
+            plt.scatter(y_list[i][0], y_list[i][1], c="blue")
+        else:
+            plt.scatter(y_list[i][0], y_list[i][1], c="red")
+    plt.xlim([0, 5])
+    plt.ylim([0, 5])
+    plt.show()
 
     # print(index)
     # print(len(alarm_list))

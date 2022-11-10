@@ -21,14 +21,14 @@ class chi_square():
             # self.Z_k = self.Z_k[:, np.newaxis]
         else:
             self.Z_k = np.append(self.Z_k, z_k,  axis=1)
-        if self.Z_k.size == 1:
+        if self.Z_k[0].size == 1:
             return False
 
 
         # z_k = np.reshape(z_k, (z_k.size, 1))
         # print(z_t.shape)
         P_k = np.cov(self.Z_k, rowvar=True, bias=True)
-        P_k = np.reshape(P_k, (-1, 1))
+        # P_k = np.reshape(P_k, (-1, 1))
         inv_ma = inv(P_k)
         # print(z_t.T.shape)
         g_k = z_k.T @ inv_ma @ z_k

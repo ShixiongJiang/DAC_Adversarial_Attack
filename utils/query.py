@@ -26,10 +26,10 @@ class Query:
     def launch(self, cur_data, cur_index):
         self.point = np.array(self.point)
         end_query = False
-        if self.index >= self.point.size:
+        if self.index >= len(self.point):
             end_query = True
             return cur_data, end_query
-        if cur_index >= self.start_index and self.index < self.point.size:
+        if cur_index >= self.start_index and self.index < len(self.point):
 
             cur_data = self.point[self.index]
             self.index += 1

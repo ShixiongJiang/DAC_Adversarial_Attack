@@ -6,7 +6,7 @@
 
 import numpy as np
 import math
-from utils import Simulator, PID
+from utils import SimulatorWithD, PID
 
 # two operating points
 op = True  # True: have minimum phase characteristics
@@ -50,7 +50,7 @@ C = [[kc, 0, 0, 0],
 
 D = [[0, 0], [0, 0]]
 
-x_0 = np.array([0, 0, 0, 0])
+x_0 = np.array([7, 3, 0, 0])
 
 # control parameters
 Kp1 = 1 # 3.0
@@ -94,7 +94,7 @@ class Controller:
         self.pid2.clear(-self.dt)
 
 
-class QuadrupleTank(Simulator):
+class QuadrupleTank(SimulatorWithD):
     """
     States: (4,)
         x[i-1]: hi - hi_0    i=1,2,3,4
@@ -114,7 +114,7 @@ class QuadrupleTank(Simulator):
         controller = Controller(dt)
         settings = {
             'init_state': x_0,
-            'feedback_type': 'output',
+            'feedback_type': 'state',
             'controller': controller
         }
         if noise:
@@ -125,7 +125,7 @@ class QuadrupleTank(Simulator):
 if __name__ == "__main__":
     max_index = 2000
     dt = 0.1
-    ref = [np.array([7, 7])]*1001 + [np.array([14, 12])]*1000
+    ref = [np.array([7, 7])]*1001 + [np.array([7, 7])]*1000
     noise = {
         'process': {
             'type': 'white',
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(2, 1)
     ax1 = ax[0]
     ax2 = ax[1]
-    t_arr = np.linspace(0, 10, max_index + 1)
+    t_arr = np.linspace(0, 2000, max_index + 1)
     ref1 = [x[0] for x in quadruple_tank.refs[:max_index + 1]]
     y1_arr = [x[0] for x in quadruple_tank.outputs[:max_index + 1]]
     ax1.set_title('x1')

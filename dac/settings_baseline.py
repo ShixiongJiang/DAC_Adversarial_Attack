@@ -78,7 +78,7 @@ class quadruple_tank_bias:
     name = 'quadruple_tank_bias'
     max_index = 300
     dt = 1
-    ref = [np.array([7, 7])] * 1001 + [np.array([7, 7])] * 1000
+    ref = [np.array([7, 3])] * 1001 + [np.array([7, 3])] * 1000
     noise = {
         'process': {
             'type': 'white',
@@ -105,11 +105,15 @@ class quadruple_tank_bias:
     y_lim = (6.7, 9)
     y_label = 'water level - cm'
     strip = (7.15, 6.85)  # modify according to strip
+    y_low = np.array([2.5, 0.5])
+    y_up = np.array([4, 2.5])
+    query_start_index = 100
+    query = Query(y_up, y_low, K=32, start_index=query_start_index)
 
     kf_C = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])  # depend on attack
     k_given = 40
-    kf_R = np.diag([1e-7, 1e-7, 1e-7])
-
+    # kf_R = np.diag([1e-7, 1e-7, 1e-7])
+    kf_R = np.diag([1e-7, 1e-7])
     # baseline
     safe_set_lo = np.array([0, 0, 0, 0])
     safe_set_up = np.array([20, 20, 20, 20])

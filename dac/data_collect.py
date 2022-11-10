@@ -20,8 +20,9 @@ from utils.controllers.LP_cvxpy import LP
 from utils.controllers.MPC_cvxpy import MPC
 from utils.detector.cusum import CUSUM
 from utils.detector.chi_square import chi_square
-exps = [motor_speed_bias]
+# exps = [motor_speed_bias]
 # exps = [rlc_circuit_bias]
+exps = [quadruple_tank_bias]
 colors = {'none': 'red', 'lp': 'cyan', 'lqr': 'blue', 'ssr': 'orange', 'oprp': 'violet', 'oprp-open': 'purple'}
 result = {}  # for print or plot
 
@@ -75,22 +76,28 @@ for exp in exps:
             x_update = exp.model.cur_x
         if i > 0:
             # exp.model.cur_y = exp.attack.launch(exp.model.cur_y, i, exp.model.states)
-            exp.model.cur_y = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
-            x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
+            exp.model.cur_y, end_query = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
+            x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, np.array(exp.model.cur_y))
             exp.model.cur_feedback = x_update
             kf_P = P_update
             alarm = detector.detect(residual)
             logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
-            if exp.model.cur_index >= exp.query.start_index:
-                reference_list.append(exp.ref[i])
-                x_update_list.append(x_update)
-                y_list.append(exp.model.cur_y)
-                control_list.append(exp.model.cur_u)
-                alarm_list.append(alarm)
-                residual_list.append(residual)
+            # if exp.model.cur_index >= exp.query.start_index:
+            #     reference_list.append(exp.ref[i])
+            #     x_update_list.append(x_update)
+            #     y_list.append(exp.model.cur_y)
+            #     control_list.append(exp.model.cur_u)
+            #     alarm_list.append(alarm)
+            #     residual_list.append(residual)
+            reference_list.append(exp.ref[i])
+            x_update_list.append(x_update)
+            y_list.append(exp.model.cur_y)
+            control_list.append(exp.model.cur_u)
+            alarm_list.append(alarm)
+            residual_list.append(residual)
 
-            if alarm and exp.model.cur_index >= exp.query_start_index:
-                exp.model.reset()
+            # if alarm and exp.model.cur_index >= exp.query_start_index:
+            #     exp.model.reset()
 
 
     df = pd.DataFrame({"reference": reference_list, "x_update": x_update_list, 'y':y_list, 'control':control_list
