@@ -59,8 +59,8 @@ for exp in exps:
     kf_R = exp.kf_R
     kf_P = np.zeros_like(A)
     kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
-    # detector = CUSUM()
-    detector = chi_square(threshold=4.61)
+    detector = CUSUM()
+    # detector = chi_square(threshold=4.61)
     x_update = None
     reference_list = []
     x_update_list = []
