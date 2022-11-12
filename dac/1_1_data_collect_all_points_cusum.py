@@ -42,7 +42,7 @@ logger.setLevel(logging.DEBUG)
 
 
 for exp in exps:
-    data_file = 'res/1_1data_collect_all_points'+exp.name+'.csv'
+    data_file = 'res/1_1data_collect_all_points_cusum_'+exp.name+'.csv'
     # headers = ['']
     # times = 50
     # with open(data_file, 'w', newline='') as f:
@@ -59,8 +59,9 @@ for exp in exps:
     kf_R = exp.kf_R
     kf_P = np.zeros_like(A)
     kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
-    # detector = CUSUM()
-    detector = chi_square(threshold=4.61)
+    C_filter = np.array([1, 0])
+    detector = CUSUM(drift=0.02, threshold=0.1)
+    # detector = chi_square(threshold=4.61)
     x_update = None
     reference_list = []
     x_update_list = []
@@ -86,7 +87,9 @@ for exp in exps:
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
             exp.model.cur_feedback = x_update
             kf_P = P_update
-            alarm = detector.detect(residual)
+            alarm_1 = detector.detect(residual[0])
+            alarm_2 = detector.detect(residual[1])
+            alarm = alarm_1 or alarm_2
             # logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
             if exp.model.cur_index >= exp.query.start_index:
                 reference_list.append(exp.ref[i])

@@ -16,7 +16,8 @@ from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 
 exp = quadruple_tank_bias
-data_file = 'res/1_1data_collect_all_pointsquadruple_tank_bias.csv'
+# data_file = 'res/1_1data_collect_all_pointsquadruple_tank_bias.csv'
+data_file = 'res/1_1data_collect_all_points_cusum_quadruple_tank_bias.csv'
 df = pd.read_csv (data_file)
 y = df['y'].to_numpy()
 alarm = df['alarm_list'].to_numpy()
@@ -42,28 +43,28 @@ for i in y:
 
 
 
-for i in range(len(y_list)):
-    if not alarm[i]:
-        plt.scatter(y_list[i][0], y_list[i][1], c="blue")
-    else:
-        plt.scatter(y_list[i][0], y_list[i][1], c="red")
-plt.xlim([0, 5])
-plt.ylim([0, 5])
-plt.show()
-
-knn = KNeighborsClassifier()
-knn.fit(y_list, alarm_list)
-# print(logisticRegr.get_params(True))
-ans = knn.predict(y_list)
-# for i in ans:
-#     if i == 0:
-#         print(i)
 # for i in range(len(y_list)):
-#     if not ans[i]:
+#     if not alarm[i]:
 #         plt.scatter(y_list[i][0], y_list[i][1], c="blue")
 #     else:
 #         plt.scatter(y_list[i][0], y_list[i][1], c="red")
 # plt.xlim([0, 5])
 # plt.ylim([0, 5])
 # plt.show()
+
+knn = KNeighborsClassifier()
+knn.fit(y_list, alarm_list)
+# print(logisticRegr.get_params(True))
+ans = knn.predict(y_list)
+for i in ans:
+    if i == 0:
+        print(i)
+for i in range(len(y_list)):
+    if not ans[i]:
+        plt.scatter(y_list[i][0], y_list[i][1], c="blue")
+    else:
+        plt.scatter(y_list[i][0], y_list[i][1], c="red")
+plt.xlim([0, 5])
+plt.ylim([0, 5])
+plt.show()
 # print(ans)
