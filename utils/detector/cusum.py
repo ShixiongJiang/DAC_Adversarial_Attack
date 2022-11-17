@@ -89,6 +89,7 @@ class CUSUM:
         self.taf = None
         self.gp = 0
         self.gn = 0
+        self.name = 'CUSUM'
 
     def detect(self, s):  # s is residual
         self.gp = self.gp + s - self.drift

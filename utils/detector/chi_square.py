@@ -11,6 +11,7 @@ class chi_square():
     def __init__(self, threshold=0.5):
         self.threshold = threshold
         self.Z_k = None
+        self.name = 'chi_square'
     # def columnCon(self, z):
     #     cov =
 
