@@ -6,11 +6,10 @@ from utils.detector.cusum import CUSUM
 # input attack_y
 # output query result, y, ref
 class QueryOnce:
-    def __init__(self,start_index = 200, exp = quadruple_tank_bias, detector = CUSUM, attack_y):
+    def __init__(self,start_index = 200, exp = quadruple_tank_bias, detector = CUSUM):
         self.start_index = start_index
         self.exp = exp
         self.detector = detector
-        self.attack_y = attack_y
         self.end_query = False
         self.kf_Q = exp.model.p_noise_dist.sigma if exp.model.p_noise_dist is not None else np.zeros_like(exp.model.sysd.A)
         self.kf = KalmanFilter(exp.model.sysd.A, exp.model.sysd.B, exp.model.sysd.C, exp.model.sysd.D, self.kf_Q, exp.kf_R)
