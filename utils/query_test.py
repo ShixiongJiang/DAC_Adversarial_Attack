@@ -1,7 +1,7 @@
 import numpy as np
 from collections import deque
 from scipy.spatial import distance
-import random
+
 
 class Query:
     def __init__(self, y_up, y_low, K=4, start_index=200, N_step=1):
@@ -41,21 +41,20 @@ class Query:
             if query_type == 'active_learn':
                 self.collect_query = np.array(self.pts_near_b)
             else:
-               self.collect_query = np.array(self.point)
+
+                self.collect_query = np.array(self.point)
+
         end_query = False
+        record_index = cur_index - self.start_index
         if self.index >= len(self.collect_query):
             end_query = True
             self.index = 0
             self.collect_query = None
             return cur_data, end_query
         if cur_index >= self.start_index and self.index < len(self.collect_query):
-            if self.N_step == 1:
-                cur_data = self.collect_query[self.index]
-                self.index += 1
-            else:
-                cur_data = self.collect_query[random.randint(0, len(self.collect_query) - 1)]
-                if cur_index - self.start_index >= self.N_step - 1:
-                    self.index += 1
+
+            cur_data = self.collect_query
+            # self.index[record_index] += 1
             return cur_data, end_query
         else:
             return cur_data, end_query

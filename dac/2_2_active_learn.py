@@ -31,8 +31,7 @@ def show_boundary(model, y_list):
     plt.show()
 
 
-
-def read_file(filename):
+def read_file(filename, N_step):
     data_file = 'res/' + filename
     df = pd.read_csv(data_file)
     y = df['y'].to_numpy()
@@ -43,6 +42,7 @@ def read_file(filename):
     alarm_list = np.empty((y.size))
     ref_list = np.empty((y.size, 1))
     index = 0
+
     for i in y:
         i = i.replace('[', '')
         i = i.replace(']', '')
@@ -50,12 +50,17 @@ def read_file(filename):
         temp = i.split()
 
         for j in range(0, n):
+
             y_list[index][j] = float(temp[j])
+
             # print(y_list[index])
         alarm_list[index] = bool(alarm[index])
 
         # alarm_list[index] = not bool(alarm[index])
         index += 1
+
+    y_list.reshape()
+
     return y_list, alarm_list
 
 
@@ -71,7 +76,8 @@ def write_file(filename, sys):
 detector = CUSUM(drift=0.02, threshold=0.3)
 exp = quadruple_tank_bias
 query_type = 'square'
-sys = System(detector=detector, exp=exp, query_type=query_type)
+N_step = 2
+sys = System(detector=detector, exp=exp, query_type=query_type, N_step=N_step)
 filename = detector.name + "_" + exp.name
 write_file(filename=filename, sys=sys)
 
@@ -96,12 +102,12 @@ knn.fit(y_list, alarm_list)
 show_boundary(knn, y_list)
 
 # print(ans)
-exp.query.set_model(knn)
-
+# sys.query.set_model(knn)
+#
 active_itr = 5
 for i in range(active_itr):
     exp = quadruple_tank_bias
-    sys = System(detector=detector, exp=exp, query_type='active_learn',N_query=20)
+    sys = System(detector=detector, exp=exp, query_type='active_learn', N_query=20, model=knn)
     write_file(filename=filename, sys=sys)
     y_list_1, alarm_list_1 = read_file(filename)
     y_list = np.concatenate((y_list, y_list_1))
@@ -109,4 +115,4 @@ for i in range(active_itr):
     knn.fit(y_list, alarm_list)
 
 show_boundary(knn, y_list)
-# print(xb1)
+

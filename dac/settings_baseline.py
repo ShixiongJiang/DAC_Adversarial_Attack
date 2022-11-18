@@ -107,8 +107,7 @@ class quadruple_tank_bias:
     strip = (7.15, 6.85)  # modify according to strip
     y_low = np.array([2.5, 0.5])
     y_up = np.array([4, 2.5])
-    query_start_index = 100
-    query = Query(y_up, y_low, K=8, start_index=query_start_index)
+
 
     kf_C = np.array([[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])  # depend on attack
     k_given = 40
