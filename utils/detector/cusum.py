@@ -131,7 +131,22 @@ class CUSUM:
         #     if self.show:
         #         _plot(x, self.threshold, self.drift, self.ending, self.ax, ta, tai, taf, gp, gn)
         #
-
+    def alarm_rate(self, s):
+        self.gp = self.gp + s - self.drift
+        self.gn = self.gn - s - self.drift
+        if self.gp < 0:
+            self.gp = 0
+        if self.gn < 0:
+            self.gn = 0
+        # TODO alarm_rate need to be modified
+        alarm_rate = 1
+        if self.gp > self.threshold or self.gn > self.threshold:  # change detected!
+            # ta = np.append(ta, i)  # alarm index
+            # tai = np.append(tai, tap if gp[i] > self.threshold else tan)  # start
+            self.gp, self.gn = 0, 0  # reset alarm
+            return alarm_rate, True
+        else:
+            return alarm_rate, False
 
 def _plot(x, threshold, drift, ending, ax, ta, tai, taf, gp, gn):
     """Plot results of the detect_cusum function, see its help."""

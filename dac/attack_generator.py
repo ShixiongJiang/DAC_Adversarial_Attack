@@ -9,6 +9,9 @@ num_layers = 1
 LR = 0.0001
 EPOCH = 10
 
+y_filter = []
+unsafe_set = [-20, 20]
+
 train_loader
 
 ## get the first 10 steps from steady state
@@ -17,6 +20,16 @@ def getData():
 ## get one step from the previews model state
 def getOneStep():
 
+def get_distance(y):
+
+
+class custumLoss(torch.nn.Module):
+    def __init__(self):
+        super(custumLoss, self).__init__()
+
+    def forward(self, alarm_rate, y):
+        custumLoss = alarm_rate + get_distance(y)
+        return custumLoss
 
 class simpleLSTM(torch.nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, output_size):
@@ -45,7 +58,7 @@ if torch.cuda.is_available():
     model = model.cuda()
 
 # loss and optimizer
-loss_func = torch.nn.MSELoss()
+loss_func = torch.nn.custumLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
 for step in range(EPOCH):
