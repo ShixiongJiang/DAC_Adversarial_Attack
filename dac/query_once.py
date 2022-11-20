@@ -7,7 +7,7 @@ import queue
 # input attack_y
 # output query result, y, ref
 class QueryOnce:
-    def __init__(self,start_index = 100, exp = quadruple_tank_bias, detector = CUSUM, step_length = 10):
+    def __init__(self, start_index=100, exp=quadruple_tank_bias, detector=CUSUM, step_length=10):
         self.start_index = start_index
         self.exp = exp
         self.detector = detector
@@ -59,7 +59,7 @@ class QueryOnce:
             self.i += 1
 
     # launch attack once
-    def evolve_Once(self, cur_data, cur_index, delta_y):
+    def evolve_once(self, cur_data, cur_index, delta_y):
         self.exp.model.cur_y = self.exp.model.cur_y + delta_y
         x_update, P_update, residual = self.kf.one_step(self.exp.model.cur_feedback, self.kf_P, self.exp.model.cur_u, self.exp.model.cur_y)
         self.exp.model.cur_feedback = x_update
