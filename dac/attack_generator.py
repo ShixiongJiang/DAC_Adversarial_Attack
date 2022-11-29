@@ -1,4 +1,5 @@
 import torch
+from query_once import QueryOnce
 
 input_size = 2
 output_size = 2
@@ -9,14 +10,42 @@ num_layers = 1
 LR = 0.0001
 EPOCH = 10
 
+#
+y_filter = []
+unsafe_set = [-20, 20]
+train_data = []
 train_loader
 
-## get the first 10 steps from steady state
-def getData():
+# get the first 10 steps from steady state
+def getData(start_index, exp, detector, step_length):
+    # get alarm_rate_queue and y_queue from q
+    q = QueryOnce(start_index, exp, detector, step_length)
+    q.evolve()
 
-## get one step from the previews model state
+
+# get one step from the previews model state
 def getOneStep():
 
+def get_distance(y, y_filter):
+    for i in y_filter:
+        if i:
+            temp = y[i]
+    d1 = y - unsafe_set[0]
+    d2 = unsafe_set[1] - y
+    if d1 <= 0:
+        return d1
+    if d2 <= 0:
+        return d2
+    distance = abs(d1) if abs(d1) < abs(d2) else abs(d2)
+    return distance
+
+class custumLoss(torch.nn.Module):
+    def __init__(self):
+        super(custumLoss, self).__init__()
+
+    def forward(self, alarm_rate, y):
+        custumLoss = alarm_rate + get_distance(y)
+        return custumLoss
 
 class simpleLSTM(torch.nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, output_size):
@@ -45,11 +74,13 @@ if torch.cuda.is_available():
     model = model.cuda()
 
 # loss and optimizer
-loss_func = torch.nn.MSELoss()
+loss_func = torch.nn.custumLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
 for step in range(EPOCH):
+
     for input in train_loader:
+
         if torch.cuda.is_available():
             input = input.cuda()
 
