@@ -41,8 +41,10 @@ class System:
         kf_P = np.zeros_like(A)
         kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
         detector = detector
+
         self.query = Query(exp.y_up, exp.y_low, K=8, start_index=query_start_index, N_step=N_step)
         x_update = None
+        self.index_list = []
         self.reference_list = []
         self.x_update_list = []
         self.y_list = []
@@ -56,7 +58,7 @@ class System:
         step = N_step
         if query_type == 'active_learn':
             self.query.active_learn(N_query)
-        while not end_query:
+        while True:
             # assert exp.model.cur_index == i
             exp.model.update_current_ref(exp.ref[i])
             exp.model.evolve()
@@ -78,6 +80,7 @@ class System:
                     alarm = detector.detect(residual)
                 # logger.debug(f"i = {exp.model.cur_index}, state={exp.model.cur_x}, update={x_update},y={exp.model.cur_y}, residual={residual}, alarm={alarm}")
                 if exp.model.cur_index >= self.query.start_index:
+                    self.index_list.append(exp.model.cur_index)
                     self.reference_list.append(exp.ref[i])
                     self.x_update_list.append(x_update)
                     self.y_list.append(exp.model.cur_y)
@@ -86,8 +89,10 @@ class System:
                     self.residual_list.append(residual)
 
                 if exp.model.cur_index >= query_start_index and exp.model.cur_index - query_start_index >= N_step - 1:
-
+                    # print(f"model reset at {exp.model.cur_index}")
                     exp.model.reset()
+                    if end_query:
+                        break
                     i = 0
             i += 1
 
