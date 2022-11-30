@@ -27,24 +27,27 @@ def show_boundary(model, y_list):
         else:
             plt.scatter(y_list[i][0], y_list[i][1], c="red", s=3)
 
-    plt.xlim([0, 5])
-    plt.ylim([0, 5])
+    plt.xlim([-5, 5])
+    plt.ylim([-5, 5])
     plt.show()
 
 
-def read_file(filename, N_step=1):
+def read_file(filename, N_step=1, col='delta_y'):
     data_file = 'res/' + filename
     df = pd.read_csv(data_file)
     y = df['y'].to_numpy()
+    delta_y = df['delta_y'].to_numpy()
     alarm = df['alarm_list'].to_numpy()
     ref = df['reference'].to_numpy()
     n = exp.model.cur_y.size
     y_list = np.empty((y.size, n))
+    delta_y_list = np.empty((y.size, n))
     alarm_list = np.empty((y.size))
     ref_list = np.empty((y.size, 1))
     index = 0
 
-    for i in y:
+    # for i in y:
+    for i in delta_y:
         i = i.replace('[', '')
         i = i.replace(']', '')
         # print(i)
@@ -58,6 +61,7 @@ def read_file(filename, N_step=1):
 
         # alarm_list[index] = not bool(alarm[index])
         index += 1
+
     if N_step == 1:
         return y_list, alarm_list
 
@@ -78,14 +82,14 @@ def read_file(filename, N_step=1):
 def write_file(filename, sys):
     df = pd.DataFrame(
         {'index': sys.index_list, "reference": sys.reference_list, "x_update": sys.x_update_list, 'y': sys.y_list, 'control': sys.control_list
-            , 'alarm_list': sys.alarm_list, 'residual': sys.residual_list})
+            , 'alarm_list': sys.alarm_list, 'residual': sys.residual_list, 'delta_y': sys.delta_y_list})
     # data_file = 'res/1_1data_collect_all_points_cusum_quadruple_tank_bias.csv'
     data_file = 'res/' + filename
     df.to_csv(data_file, index=True)
 
 
 # detector = CUSUM(drift=0.02, threshold=0.3)
-detector = chi_square(threshold=6.61)
+detector = chi_square(threshold=8.61)
 exp = quadruple_tank_bias
 query_type = 'square'
 N_step = 1
@@ -113,16 +117,16 @@ knn.fit(y_list, alarm_list)
 show_boundary(knn, y_list)
 
 
-active_itr = 5
+active_itr = 3
 for i in range(active_itr):
     exp = quadruple_tank_bias
-    sys = System(detector=detector, exp=exp, N_step=N_step,query_type='active_learn', N_query=10, model=knn)
+    sys = System(detector=detector, exp=exp, N_step=N_step,query_type='active_learn', N_query=10, MLmodel=knn)
     write_file(filename=filename, sys=sys)
     y_list_1, alarm_list_1 = read_file(filename, N_step=N_step)
     y_list = np.concatenate((y_list, y_list_1))
     alarm_list = np.concatenate((alarm_list, alarm_list_1))
     knn.fit(y_list, alarm_list)
-
+print(y_list)
 show_boundary(knn, y_list)
 ans = knn.predict(y_list)
 print(ans)

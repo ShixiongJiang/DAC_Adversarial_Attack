@@ -26,7 +26,7 @@ from utils.detector.chi_square import chi_square
 
 
 class System:
-    def __init__(self, detector, exp, query_type='square', N_query=10, N_step=1, query_start_index=100, model=None): # N_step is the number of step to
+    def __init__(self, detector, exp, query_type='square', N_query=10, N_step=1, query_start_index=100, MLmodel=None): # N_step is the number of step to
         # train the detector with N query
         self.data_file = ('res/1_1data_collect_all_points' + exp.name + '.csv')
         exp_name = f"{exp.name}"
@@ -51,8 +51,9 @@ class System:
         self.control_list = []
         self.alarm_list = []
         self.residual_list = []
-        if model is not None:
-            self.query.set_model(model)
+        self.delta_y_list = []
+        if MLmodel is not None:
+            self.query.set_model(MLmodel)
         end_query = False
         i = 0
         step = N_step
@@ -66,9 +67,9 @@ class System:
                 x_update = exp.model.cur_x
             if i > 0:
                 # exp.model.cur_y = exp.attack.launch(exp.model.cur_y, i, exp.model.states)
-
+                cur_y = exp.model.cur_y
                 exp.model.cur_y, end_query = self.query.launch(exp.model.cur_y, exp.model.cur_index, query_type)
-
+                delta_y = exp.model.cur_y - cur_y
                 x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, exp.model.cur_y)
                 exp.model.cur_feedback = x_update
                 kf_P = P_update
@@ -87,6 +88,7 @@ class System:
                     self.control_list.append(exp.model.cur_u)
                     self.alarm_list.append(alarm)
                     self.residual_list.append(residual)
+                    self.delta_y_list.append(delta_y)
 
                 if exp.model.cur_index >= query_start_index and exp.model.cur_index - query_start_index >= N_step - 1:
                     # print(f"model reset at {exp.model.cur_index}")

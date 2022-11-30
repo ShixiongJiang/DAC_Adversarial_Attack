@@ -51,13 +51,15 @@ class Query:
             if cur_index == self.start_index and self.index < len(self.collect_query):
                 a = (cur_index - self.start_index ) * self.y_size
                 b = a + self.y_size
-                cur_data = self.collect_query[self.index][a:b]
+                # cur_data = self.collect_query[self.index][a:b]
+                cur_data = self.collect_query[self.index][a:b] + cur_data
                 self.index += 1
                 return cur_data, self.end_query
             elif cur_index > self.start_index:
                 a = (cur_index - self.start_index) * self.y_size
                 b = a + self.y_size
-                cur_data = self.collect_query[self.index][a:b]
+                # cur_data = self.collect_query[self.index][a:b]
+                cur_data = self.collect_query[self.index][a:b] + cur_data
                 return cur_data, self.end_query
             else:
                 return cur_data, self.end_query
@@ -115,11 +117,13 @@ class Query:
             temp = None
             for i in range(self.N_step):
                 if temp is None:
-                    temp = np.random.rand(self.y_size)
-                    temp = temp * (self.y_up - self.y_low) + self.y_low
+                    temp = np.random.rand(self.y_size) - 0.5
+                    temp = temp * (self.y_up - self.y_low)
+                    # temp = temp * (self.y_up - self.y_low) + self.y_low
                 else:
-                    a = np.random.rand(self.y_size)
-                    a = a * (self.y_up - self.y_low) + self.y_low
+                    a = np.random.rand(self.y_size) - 0.5
+                    a = a * (self.y_up - self.y_low)
+                    # a = a * (self.y_up - self.y_low) + self.y_low
                     temp = np.concatenate((temp, a))
             return temp
 

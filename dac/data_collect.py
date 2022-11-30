@@ -59,7 +59,7 @@ for exp in exps:
     kf_P = np.zeros_like(A)
     kf = KalmanFilter(A, B, C, D, kf_Q, kf_R)
     # detector = CUSUM()
-    detector = chi_square(threshold=4.61)
+    detector = chi_square(threshold=10.61)
     x_update = None
     reference_list = []
     x_update_list = []
@@ -76,7 +76,7 @@ for exp in exps:
             x_update = exp.model.cur_x
         if i > 0:
             # exp.model.cur_y = exp.attack.launch(exp.model.cur_y, i, exp.model.states)
-            exp.model.cur_y, end_query = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
+            # exp.model.cur_y, end_query = exp.query.launch(exp.model.cur_y, exp.model.cur_index)
             x_update, P_update, residual = kf.one_step(x_update, kf_P, exp.model.cur_u, np.array(exp.model.cur_y))
             exp.model.cur_feedback = x_update
             kf_P = P_update
@@ -103,10 +103,10 @@ for exp in exps:
     df = pd.DataFrame({"reference": reference_list, "x_update": x_update_list, 'y':y_list, 'control':control_list
                        , 'alarm_list': alarm_list, 'residual':residual_list})
     df.to_csv(data_file, index=True)
-    index = 0
+    alarm_time = 0
     for x in alarm_list:
         if x:
-            index += 1
+            alarm_time += 1
 
-    # print(index)
+    print(alarm_time)
     # print(len(alarm_list))
