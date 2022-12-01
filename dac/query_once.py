@@ -9,7 +9,7 @@ import joblib
 # input attack_y
 # output query result, y, ref
 class QueryOnce:
-    def __init__(self, detector, start_index=150, exp=quadruple_tank_bias, step_length=10):
+    def __init__(self, detector, start_index=100, exp=quadruple_tank_bias, step_length=10):
         self.start_index = start_index
         self.exp = exp
         self.detector = detector
@@ -44,6 +44,7 @@ class QueryOnce:
                 self.exp.model.cur_feedback = x_update
                 self.kf_P = P_update
                 # alarm = self.detector.detect(residual)
+                # print(residual)
                 alarm = self.detector.detect(residual)
 
                 # # start recording
@@ -74,8 +75,8 @@ class QueryOnce:
         self.exp.model.cur_feedback = x_update
         self.kf_P = P_update
 
-        print('residual')
-        print(residual)
+        # print('residual')
+        # print(residual)
         alarm = self.detector.detect(residual)
         alarm_rate = self.knn.predict_proba([delta_y])
         # if self.alarm_rate_queue.full():
@@ -95,19 +96,26 @@ class QueryOnce:
         return self.alarm_rate_list, self.y_list
 
 
-detector = chi_square(threshold=8.61)
-query = QueryOnce(detector=detector)
-query.evolve()
-print(query.y_list)
+# detector = chi_square(threshold=8.61)
+# detector = chi_square(threshold=20)
+# query = QueryOnce(detector=detector)
+# query.evolve()
+# print(query.y_list)
 
-delta_y = [0.01087429, 0.01907974]
-query.evolve_once(delta_y)
-print(query.y_list)
-print(query.alarm_list)
-print(query.alarm_rate_list)
+# delta_y = [-0.07503427, -0.14751052]
+# query.evolve_once(delta_y)
+# print(query.y_list)
+# print(query.alarm_list)
+# print(query.alarm_rate_list)
+#
+# delta_y = [0.4765643, 0.07827326]
+# query.evolve_once(delta_y)
+# print(query.y_list)
+# print(query.alarm_list)
+# print(query.alarm_rate_list)
 
-delta_y = [0.01087429, 0.01907974]
-query.evolve_once(delta_y)
-print(query.y_list)
-print(query.alarm_list)
-print(query.alarm_rate_list)
+# delta_y = [5, 0]
+# for i in range(300):
+#     query.evolve_once(delta_y)
+# print(query.y_list)
+# print(query.alarm_list)

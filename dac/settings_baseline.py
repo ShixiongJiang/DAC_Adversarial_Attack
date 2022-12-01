@@ -76,7 +76,7 @@ class motor_speed_bias:
 class quadruple_tank_bias:
     # needed by 0_attack_no_recovery
     name = 'quadruple_tank_bias'
-    max_index = 300
+    max_index = 500
     dt = 1
     ref = [np.array([7, 3])] * 1001 + [np.array([7, 3])] * 1000
     noise = {

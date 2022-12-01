@@ -95,7 +95,7 @@ detector = chi_square(threshold=8.61)
 exp = quadruple_tank_bias
 query_type = 'square'
 N_step = 1
-sys = System(detector=detector, exp=exp, query_type=query_type, N_step=N_step, N_query=20)
+sys = System(detector=detector, exp=exp, query_type=query_type, N_step=N_step, N_query=50)
 filename = detector.name + "_" + exp.name
 write_file(filename=filename, sys=sys)
 
@@ -119,7 +119,7 @@ knn.fit(y_list, alarm_list)
 show_boundary(knn, y_list)
 
 
-active_itr = 3
+active_itr = 5
 for i in range(active_itr):
     exp = quadruple_tank_bias
     sys = System(detector=detector, exp=exp, N_step=N_step,query_type='active_learn', N_query=10, MLmodel=knn)
