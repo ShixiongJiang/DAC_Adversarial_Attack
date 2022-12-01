@@ -12,6 +12,7 @@ class chi_square():
         self.threshold = threshold
         self.Z_k = None
         self.name = 'chi_square'
+        self.g = 0
     # def columnCon(self, z):
     #     cov =
 
@@ -34,7 +35,7 @@ class chi_square():
         # print(z_t.T.shape)
         g_k = z_k.T @ inv_ma @ z_k
         # print(g_k)
-
+        self.g = g_k
 
 
 
