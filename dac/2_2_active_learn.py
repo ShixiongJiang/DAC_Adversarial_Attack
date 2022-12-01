@@ -16,6 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from system import System
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
+import joblib
 
 
 def show_boundary(model, y_list):
@@ -85,6 +86,7 @@ def write_file(filename, sys):
             , 'alarm_list': sys.alarm_list, 'residual': sys.residual_list, 'delta_y': sys.delta_y_list})
     # data_file = 'res/1_1data_collect_all_points_cusum_quadruple_tank_bias.csv'
     data_file = 'res/' + filename
+    print(data_file)
     df.to_csv(data_file, index=True)
 
 
@@ -126,6 +128,8 @@ for i in range(active_itr):
     y_list = np.concatenate((y_list, y_list_1))
     alarm_list = np.concatenate((alarm_list, alarm_list_1))
     knn.fit(y_list, alarm_list)
+joblib.dump(knn, 'save/knn.pkl')
+# knn = joblib.load('save/knn.pkl')
 print(y_list)
 show_boundary(knn, y_list)
 ans = knn.predict(y_list)

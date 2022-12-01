@@ -3,6 +3,7 @@ from settings_baseline import motor_speed_bias, quadruple_tank_bias, lane_keepin
 from utils.observers.kalman_filter import KalmanFilter
 from utils.detector.cusum import CUSUM
 import queue
+import joblib
 
 # input attack_y
 # output query result, y, ref
@@ -77,3 +78,8 @@ class QueryOnce:
 
         self.i += 1
         return self.alarm_rate_queue, self.y_queue
+
+query = QueryOnce()
+query.evolve()
+print('y_queue' + query.y_queue)
+print('alarm_rate_queue' + query.alarm_rate_queue)

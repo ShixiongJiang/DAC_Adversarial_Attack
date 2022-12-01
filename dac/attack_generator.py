@@ -1,5 +1,7 @@
 import torch
 from query_once import QueryOnce
+import joblib
+from sklearn.neighbors import KNeighborsClassifier
 
 input_size = 2
 output_size = 2
@@ -39,12 +41,16 @@ def get_distance(y, y_filter):
     distance = abs(d1) if abs(d1) < abs(d2) else abs(d2)
     return distance
 
+def get_alarm_rate(y, knn):
+    temp = knn.predict_proba(y)
+    return temp[0]
+
 class custumLoss(torch.nn.Module):
     def __init__(self):
         super(custumLoss, self).__init__()
 
-    def forward(self, alarm_rate, y):
-        custumLoss = alarm_rate + get_distance(y)
+    def forward(self, y):
+        custumLoss = get_alarm_rate(y, knn) + get_distance(y)
         return custumLoss
 
 class simpleLSTM(torch.nn.Module):
@@ -74,6 +80,7 @@ if torch.cuda.is_available():
     model = model.cuda()
 
 # loss and optimizer
+knn = joblib.load('save/knn.pkl')
 loss_func = torch.nn.custumLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
