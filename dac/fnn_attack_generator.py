@@ -5,10 +5,7 @@ import joblib
 from utils.detector.chi_square import chi_square
 from sklearn.neighbors import KNeighborsClassifier
 
-
 batch_size = 1
-
-
 in_dim = 2
 n_hidden_1 = 32
 n_hidden_2 = 64
@@ -17,7 +14,6 @@ out_dim = 2
 LR = 0.0001
 EPOCH = 3
 
-#
 y_filter = [1, 0]
 unsafe_set = [3.3, 3.5]
 train_data = []
