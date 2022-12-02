@@ -10,7 +10,7 @@ import pandas as pd
 from utils.query import Query
 import matplotlib.pyplot as plt
 
-os.environ["RANDOM_SEED"] = '0'  # for reproducibility
+# os.environ["RANDOM_SEED"] = '0'  # for reproducibility
 
 from settings_baseline import motor_speed_bias, quadruple_tank_bias, lane_keeping, f16_bias, aircraft_pitch_bias, \
     boeing747_bias, platoon_bias, quadrotor_bias, rlc_circuit_bias
