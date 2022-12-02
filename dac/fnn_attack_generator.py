@@ -87,8 +87,8 @@ class custumLoss(torch.nn.Module):
         # print('alarm_data_tensor')
         # print(alarm_data_tensor)
         custumLoss = alarm_data_tensor + get_distance()
-        print('alarm_data_tensor: ' + str(alarm_data_tensor))
-        print('get_distance: ' + str(get_distance()))
+        # print('alarm_data_tensor: ' + str(alarm_data_tensor))
+        # print('get_distance: ' + str(get_distance()))
         # print('get distance')
         # print(get_distance())
         return custumLoss
