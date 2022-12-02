@@ -11,11 +11,11 @@ n_hidden_1 = 32
 n_hidden_2 = 64
 out_dim = 2
 
-LR = 0.0001
-EPOCH = 3
+LR = 0.001
+EPOCH = 50
 
 y_filter = [1, 0]
-unsafe_set = [3.3, 3.5]
+unsafe_set = [3.3, 3.3]
 train_data = []
 alarm_data = []
 train_data_tensor = torch.tensor((), dtype=torch.float64)
@@ -57,18 +57,25 @@ def getOneStep(delta_y, step):
 
 
 def get_distance():
+    # global flag
     y = train_data_tensor
     for i in y_filter:
         if i:
             temp = y[i]
-    d1 = temp - unsafe_set[0]
-    d2 = unsafe_set[1] - temp
-    if d1 <= 0:
-        return abs(d1)
-    if d2 <= 0:
-        return d2
-    distance = abs(d1) if abs(d1) < abs(d2) else abs(d2)
-    return distance
+    dis = temp - unsafe_set[0]
+    if dis < -0.2:
+        # flag = True
+        return 0
+    else:
+        return dis
+    # d1 = temp - unsafe_set[0]
+    # d2 = unsafe_set[1] - temp
+    # if d1 <= 0:
+    #     return abs(d1)
+    # if d2 <= 0:
+    #     return d2
+    # distance = abs(d1) if abs(d1) < abs(d2) else abs(d2)
+    # return distance
 
 
 class custumLoss(torch.nn.Module):
@@ -80,6 +87,8 @@ class custumLoss(torch.nn.Module):
         # print('alarm_data_tensor')
         # print(alarm_data_tensor)
         custumLoss = alarm_data_tensor + get_distance()
+        print('alarm_data_tensor: ' + str(alarm_data_tensor))
+        print('get_distance: ' + str(get_distance()))
         # print('get distance')
         # print(get_distance())
         return custumLoss
@@ -107,17 +116,20 @@ if torch.cuda.is_available():
 loss_func = custumLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
+start_index = 100
 # train
 for step in range(EPOCH):
+    # flag = False
     reset()
     detector = chi_square(threshold=8.61)
-    query = QueryOnce(detector=detector)
+    query = QueryOnce(detector=detector, start_index=start_index)
+    start_index = start_index + 5
     getInitialData()
     print('initial training data')
     print(train_data_tensor)
 
     print('step:' + str(step))
-    for i in range(100):
+    for i in range(50):
         if torch.cuda.is_available():
             input_data = train_data_tensor.cuda().float()
         else:
@@ -125,6 +137,7 @@ for step in range(EPOCH):
 
         # output = model(torch.unsqueeze(input_data, dim=2))
         output = model(input_data)
+        print(output)
         loss = loss_func(torch.squeeze(output), i)
         # print('loss')
         # print(loss)
@@ -135,5 +148,7 @@ for step in range(EPOCH):
         print(i, loss.cpu())
         if i % 49:
             torch.save(model, 'save/model.pkl')
+        # if flag:
+        #     break
 
 torch.save(model, 'save/model.pkl')

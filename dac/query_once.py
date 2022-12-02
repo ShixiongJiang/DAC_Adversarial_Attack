@@ -9,7 +9,7 @@ import joblib
 # input attack_y
 # output query result, y, ref
 class QueryOnce:
-    def __init__(self, detector, start_index=200, exp=quadruple_tank_bias, step_length=10):
+    def __init__(self, detector, start_index=100, exp=quadruple_tank_bias, step_length=10):
         self.start_index = start_index
         self.exp = exp
         self.detector = detector
