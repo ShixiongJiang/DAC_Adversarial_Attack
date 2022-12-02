@@ -15,7 +15,7 @@ n_hidden_2 = 64
 out_dim = 2
 
 LR = 0.0001
-EPOCH = 50
+EPOCH = 3
 
 #
 y_filter = [1, 0]
@@ -25,21 +25,40 @@ alarm_data = []
 train_data_tensor = torch.tensor((), dtype=torch.float64)
 alarm_data_tensor = torch.tensor((), dtype=torch.float64)
 
+
+def reset():
+    global train_data_tensor
+    global alarm_data_tensor
+    global alarm_data
+    global train_data
+    train_data = []
+    alarm_data = []
+    train_data_tensor = torch.tensor((), dtype=torch.float64)
+    alarm_data_tensor = torch.tensor((), dtype=torch.float64)
+
+
 def getInitialData():
     global train_data_tensor
+    global query
     query.evolve()
+    global train_data
     train_data.append(query.y_list[0])
     train_data_tensor = torch.tensor(train_data[0])
+
 
 # get one step from the previews model state
 def getOneStep(delta_y, step):
     global train_data_tensor
     global alarm_data_tensor
+    global alarm_data
+    global train_data
+    global query
     query.evolve_once(delta_y)
     train_data.append(query.y_list[step + 1])
     train_data_tensor = torch.tensor(train_data[step + 1])
     alarm_data.append((query.alarm_rate_list[step][0][1]))
     alarm_data_tensor = torch.tensor(alarm_data[step])
+
 
 def get_distance():
     y = train_data_tensor
@@ -55,6 +74,7 @@ def get_distance():
     distance = abs(d1) if abs(d1) < abs(d2) else abs(d2)
     return distance
 
+
 class custumLoss(torch.nn.Module):
     def __init__(self):
         super(custumLoss, self).__init__()
@@ -67,6 +87,7 @@ class custumLoss(torch.nn.Module):
         # print('get distance')
         # print(get_distance())
         return custumLoss
+
 
 class simpleNet(torch.nn.Module):
     def __init__(self, in_dim, n_hidden_1, n_hidden_2, out_dim):
@@ -82,19 +103,6 @@ class simpleNet(torch.nn.Module):
         return x
 
 
-detector = chi_square(threshold=8.61)
-query = QueryOnce(detector=detector)
-# train_data_tensor = getInitialData()
-getInitialData()
-print('initial training data')
-print(train_data_tensor)
-
-# delta_y = [0.01503427, 0.01751052]
-# # train_data_tensor, alarm_data_tensor = getOneStep(delta_y, 0, train_data_tensor)
-# train_data_tensor, alarm_data_tensor = getOneStep(delta_y, 0)
-# print(train_data_tensor)
-# print(alarm_data_tensor)
-
 model = simpleNet(in_dim, n_hidden_1, n_hidden_2, out_dim)
 if torch.cuda.is_available():
     model = model.cuda()
@@ -105,8 +113,15 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
 # train
 for step in range(EPOCH):
+    reset()
+    detector = chi_square(threshold=8.61)
+    query = QueryOnce(detector=detector)
+    getInitialData()
+    print('initial training data')
+    print(train_data_tensor)
+
     print('step:' + str(step))
-    for i in range(50):
+    for i in range(100):
         if torch.cuda.is_available():
             input_data = train_data_tensor.cuda().float()
         else:
@@ -124,16 +139,5 @@ for step in range(EPOCH):
         print(i, loss.cpu())
         if i % 49:
             torch.save(model, 'save/model.pkl')
-
-    train_data = []
-    alarm_data = []
-    train_data_tensor = torch.tensor((), dtype=torch.float64)
-    alarm_data_tensor = torch.tensor((), dtype=torch.float64)
-    del query
-    detector = chi_square(threshold=8.61)
-    query = QueryOnce(detector=detector)
-    getInitialData()
-    print('initial training data')
-    print(train_data_tensor)
 
 torch.save(model, 'save/model.pkl')

@@ -9,7 +9,7 @@ import joblib
 # input attack_y
 # output query result, y, ref
 class QueryOnce:
-    def __init__(self, detector, start_index=100, exp=quadruple_tank_bias, step_length=10):
+    def __init__(self, detector, start_index=200, exp=quadruple_tank_bias, step_length=10):
         self.start_index = start_index
         self.exp = exp
         self.detector = detector
@@ -18,7 +18,7 @@ class QueryOnce:
         self.kf = KalmanFilter(exp.model.sysd.A, exp.model.sysd.B, exp.model.sysd.C, exp.model.sysd.D, self.kf_Q, exp.kf_R)
         self.kf_P = np.zeros_like(exp.model.sysd.A)
 
-        x_update = None
+        self.x_update = None
         self.x_update_list = []
         self.y_list = []
         self.alarm_rate_list = []
@@ -41,11 +41,11 @@ class QueryOnce:
             self.exp.model.update_current_ref(self.exp.ref[self.i])
             self.exp.model.evolve()
             if self.i == 0:
-                x_update = self.exp.model.cur_x
+                self.x_update = self.exp.model.cur_x
             if self.i > 0:
                 # self.exp.model.cur_y, end_query = self.exp.query.launch(self.exp.model.cur_y, self.exp.model.cur_index)
-                x_update, P_update, residual = self.kf.one_step(x_update, self.kf_P, self.exp.model.cur_u, self.exp.model.cur_y)
-                self.exp.model.cur_feedback = x_update
+                self.x_update, P_update, residual = self.kf.one_step(self.x_update, self.kf_P, self.exp.model.cur_u, self.exp.model.cur_y)
+                self.exp.model.cur_feedback = self.x_update
                 self.kf_P = P_update
                 # alarm = self.detector.detect(residual)
                 # print(residual)

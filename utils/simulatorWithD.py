@@ -17,17 +17,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-rseed_str = os.getenv('RANDOM_SEED')
-if rseed_str is None:
-    rseed = np.uint32(int(time.time()))
-else:
-    try:
-        rseed = np.uint32(rseed_str)
-    except Exception as e:
-        print('rseed read error:', e)
-        rseed = np.uint32(int(time.time()))
-logger.info(f'simulator: numpy random seed is set to {rseed}.')
-np.random.seed(rseed)
+# rseed_str = os.getenv('RANDOM_SEED')
+# if rseed_str is None:
+#     rseed = np.uint32(int(time.time()))
+# else:
+#     try:
+#         rseed = np.uint32(rseed_str)
+#     except Exception as e:
+#         print('rseed read error:', e)
+#         rseed = np.uint32(int(time.time()))
+# logger.info(f'simulator: numpy random seed is set to {rseed}.')
+# np.random.seed(rseed)
 
 class SimulatorWithD:
     """
